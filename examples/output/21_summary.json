@@ -1,0 +1,25 @@
+{
+  "h1b_spectral_block": {
+    "n_cities": 11,
+    "z_kde_beta": -0.19561137264369594,
+    "z_kde_p": NaN,
+    "sign_correct": true,
+    "sig_001": false
+  },
+  "gap_regression": {
+    "n_cities": 14,
+    "dirichlet_beta": -1.294643418308787,
+    "dirichlet_p": 0.10151327159694803,
+    "log_N_beta": 0.16493132287769013,
+    "log_N_p": 0.7879221550430404,
+    "R2_overall": 0.33325626190456614,
+    "sign_correct": true,
+    "sig_005": false
+  },
+  "mediator_model": {
+    "z_kde_beta": -0.09280785206731439,
+    "z_kde_p": 0.10583522783125884,
+    "eig_energy_beta": -0.0388661325220398,
+    "eig_energy_p": 0.6521869956859545
+  }
+}
