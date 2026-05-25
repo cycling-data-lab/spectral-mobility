@@ -42,6 +42,7 @@ from spectral_mobility.graph import (
     haversine_distance_matrix,
     symmetric_normalised_laplacian,
 )
+from spectral_mobility.predictor import SpectralAugmentedRegressor
 from spectral_mobility.spectral import (
     inverse_participation_ratio,
     level_spacing_ratios,
@@ -49,7 +50,7 @@ from spectral_mobility.spectral import (
     spectral_decomposition,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "__version__",
@@ -74,4 +75,6 @@ __all__ = [
     "bottleneck_modes",
     "locate_bottleneck_nodes",
     "extended_subspace_fraction",
+    # predictor
+    "SpectralAugmentedRegressor",
 ]

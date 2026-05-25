@@ -2,8 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/license/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-41%20passing-brightgreen.svg)](./tests/)
-[![Version](https://img.shields.io/badge/version-0.1.0-orange.svg)](./pyproject.toml)
+[![Tests](https://img.shields.io/badge/tests-50%20passing-brightgreen.svg)](./tests/)
+[![Version](https://img.shields.io/badge/version-0.2.0-orange.svg)](./pyproject.toml)
 
 **Spectral feature augmentation and applicability-domain bounds for urban mobility prediction.**
 
@@ -38,7 +38,35 @@ Requires Python ≥ 3.10, numpy, scipy, scikit-learn, pandas.  Plotting
 helpers and notebook examples require the optional `[plotting]` and
 `[examples]` extras.
 
-## Quick start
+## Quick start — high-level prediction API
+
+```python
+from spectral_mobility import SpectralAugmentedRegressor
+
+# X = (N, p) feature matrix; coords = (N, 2) [lat, lng]; y = (N,) target
+model = SpectralAugmentedRegressor(K=16, k_nn=6, sigma=300.0)
+model.fit(X, coords, y)
+y_hat = model.predict()                  # transductive prediction
+
+# Closed-form ceiling diagnostic
+print(model.ceiling())
+
+# Side-by-side comparison: augmented vs baseline (no augmentation), 5-fold LSO
+result = model.cross_validate(X, coords, y, n_folds=5)
+print(f"baseline R²:  {result['baseline_mean']:+.3f}")
+print(f"augmented R²: {result['augmented_mean']:+.3f}")
+print(f"gain:         {result['mean_gain']:+.3f}")
+```
+
+On Boston Bluebikes (493 stations, 4 IMD features, 5-fold LSO):
+**baseline R² = +0.05  →  augmented R² = +0.40  (gain +0.35)**.
+See [`examples/02_boston_bikeshare.py`](./examples/02_boston_bikeshare.py).
+
+The wrapper defaults to LightGBM if available, falling back to
+`sklearn.ensemble.GradientBoostingRegressor` otherwise.  Any
+sklearn-compatible regressor can be passed as ``base_estimator``.
+
+## Lower-level API
 
 ```python
 import numpy as np
@@ -67,7 +95,7 @@ X_aug = augment_features(X_imd, eigvecs, K=16)
 ```
 
 See [`examples/01_quickstart.py`](./examples/01_quickstart.py) for a
-synthetic end-to-end demo.
+synthetic end-to-end demo using the low-level API.
 
 ## API at a glance
 
@@ -87,6 +115,7 @@ synthetic end-to-end demo.
 | `bottleneck_modes(eigvecs, n_top)` | Indices of most-localized eigenmodes |
 | `locate_bottleneck_nodes(psi, mass_threshold)` | Geographic footprint of a localized mode |
 | `extended_subspace_fraction(eigvecs)` | What fraction of modes are extended |
+| `SpectralAugmentedRegressor(...)` | sklearn-style wrapper: `.fit(X, coords, y)`, `.predict()`, `.ceiling()`, `.cross_validate(...)` |
 
 ## Theory in two sentences
 
