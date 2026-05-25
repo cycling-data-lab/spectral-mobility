@@ -1,0 +1,31 @@
+{
+  "vif_dirichlet_unnorm": {
+    "vif_z_kde": 1.7131020994156538,
+    "vif_dirichlet": 1.8445270114812056,
+    "vif_log_N": 2.3514299192150183,
+    "corr_z_kde_dirichlet": -0.11705541046261933
+  },
+  "vif_dirichlet_sym": {
+    "vif_z_kde": 1.7319610991727725,
+    "vif_dirichlet": 1.7974612744436809,
+    "vif_log_N": 2.2760606132676333,
+    "corr_z_kde_dirichlet": -0.14253886352858228
+  },
+  "corr_dirichlet_unnorm": {
+    "r_aug": -0.927219801951176,
+    "r_base": -0.8836852448189259,
+    "r_gain": -0.2725135541394867
+  },
+  "corr_dirichlet_sym": {
+    "r_aug": -0.9358438964429694,
+    "r_base": -0.8734606540382646,
+    "r_gain": -0.35877269815031526
+  },
+  "h1b": {
+    "z_kde_beta": -0.010140228663503144,
+    "z_kde_p": 0.01563345764771851,
+    "n_cities": 15,
+    "sign_correct": true,
+    "sig_005": true
+  }
+}

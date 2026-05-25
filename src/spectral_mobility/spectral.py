@@ -124,6 +124,60 @@ def participation_ratio(eigvecs: np.ndarray) -> np.ndarray:
     return 1.0 / (N * ipr + 1e-30)
 
 
+def dirichlet_energy(L: np.ndarray, y: np.ndarray) -> float:
+    """Dirichlet energy of a node signal y on a graph with Laplacian L.
+
+    Defined as
+    ``E_D(y) = (y - y̅)ᵀ L (y - y̅) / (y - y̅)ᵀ (y - y̅)``
+    on the centred signal.  Equals the average Laplacian eigenvalue
+    weighted by ``y``'s spectral energy, i.e. how much ``y`` lives in
+    high-frequency modes.
+
+    Interpretation
+    --------------
+    - ``E_D ≈ 0`` → ``y`` is constant or lives in the lowest-frequency
+      modes (smooth on the graph).
+    - ``E_D ≈ ⟨λ⟩`` → ``y`` is white-noise (uniformly distributed
+      across modes).
+    - ``E_D`` large → ``y`` lives in localised / high-frequency modes
+      (rough on the graph).
+
+    For the symmetric normalised Laplacian, ``E_D ∈ [0, 2]``.
+
+    Parameters
+    ----------
+    L : (N, N) np.ndarray or sparse matrix
+        Graph Laplacian.  Typically the symmetric normalised one.
+    y : (N,) np.ndarray
+        Node signal.  Centred internally.
+
+    Returns
+    -------
+    e_d : float
+        Dirichlet energy.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from spectral_mobility import (
+    ...     build_geographic_knn, symmetric_normalised_laplacian, dirichlet_energy,
+    ... )
+    >>> rng = np.random.default_rng(0)
+    >>> lat = rng.uniform(0, 1, 100); lng = rng.uniform(0, 1, 100)
+    >>> W, _ = build_geographic_knn(lat, lng, k=5)
+    >>> L = symmetric_normalised_laplacian(W)
+    >>> y_smooth = lat  # smooth function of coords → low Dirichlet
+    >>> y_rough = rng.standard_normal(100)  # white noise → ⟨λ⟩
+    >>> float(dirichlet_energy(L, y_smooth)) < float(dirichlet_energy(L, y_rough))
+    True
+    """
+    L = L.toarray() if hasattr(L, "toarray") else np.asarray(L)
+    y = np.asarray(y, dtype=float).ravel()
+    y = y - y.mean()
+    denom = float(y @ y) + 1e-30
+    return float(y @ L @ y) / denom
+
+
 def level_spacing_ratios(eigvals: np.ndarray) -> np.ndarray:
     """Adjacent gap ratios r_n = min(s_n, s_{n+1}) / max(s_n, s_{n+1}).
 

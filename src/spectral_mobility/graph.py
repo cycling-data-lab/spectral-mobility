@@ -168,6 +168,48 @@ def build_feature_knn(
     return (0.5 * (W + W.T)).tocsr(), sigma_used
 
 
+def unnormalised_laplacian(
+    W: csr_matrix | np.ndarray, *, dense: bool | None = None
+) -> np.ndarray | csr_matrix:
+    """Unnormalised graph Laplacian ``L = D − W``.
+
+    Use this when computing the Dirichlet energy of a node-valued
+    *volume* (counts, intensities not divided by anything), because
+    ``y^T L y = Σ_{(i,j) ∈ E} w_ij (y_i − y_j)²`` is then the natural
+    discrete gradient norm of ``y``.  For per-degree intensities or
+    when comparing graphs of widely varying density, prefer
+    :func:`symmetric_normalised_laplacian` (its Dirichlet form
+    compares ``y_i / √d_i`` instead).
+
+    Parameters
+    ----------
+    W : (N, N) array-like or scipy.sparse matrix
+        Edge weight matrix; should be symmetric.
+    dense : bool or None, default None
+        Same convention as :func:`symmetric_normalised_laplacian`.
+
+    Returns
+    -------
+    L : np.ndarray or scipy.sparse.csr_matrix
+    """
+    if issparse(W):
+        N = W.shape[0]
+        deg = np.asarray(W.sum(axis=1)).ravel()
+    else:
+        W = np.asarray(W, dtype=float)
+        N = W.shape[0]
+        deg = W.sum(axis=1)
+    if dense is None:
+        dense = N <= 5000
+    if dense:
+        W_d = W.toarray() if issparse(W) else W
+        L = np.diag(deg) - W_d
+        return 0.5 * (L + L.T)
+    from scipy.sparse import diags
+    D = diags(deg)
+    return (D - W).tocsr()
+
+
 def symmetric_normalised_laplacian(
     W: csr_matrix | np.ndarray, *, dense: bool | None = None
 ) -> np.ndarray | csr_matrix:

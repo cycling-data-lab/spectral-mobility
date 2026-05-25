@@ -55,17 +55,19 @@ from spectral_mobility.graph import (
     build_geographic_knn,
     haversine_distance_matrix,
     symmetric_normalised_laplacian,
+    unnormalised_laplacian,
 )
 from spectral_mobility.predictor import SpectralAugmentedRegressor
 from spectral_mobility.profile import CitySpectralProfile
 from spectral_mobility.spectral import (
+    dirichlet_energy,
     inverse_participation_ratio,
     level_spacing_ratios,
     participation_ratio,
     spectral_decomposition,
 )
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 __all__ = [
     "__version__",
@@ -74,11 +76,13 @@ __all__ = [
     "build_feature_knn",
     "haversine_distance_matrix",
     "symmetric_normalised_laplacian",
+    "unnormalised_laplacian",
     # spectral
     "spectral_decomposition",
     "inverse_participation_ratio",
     "participation_ratio",
     "level_spacing_ratios",
+    "dirichlet_energy",
     # bound
     "r2_spec_subspace",
     "spectral_bound",

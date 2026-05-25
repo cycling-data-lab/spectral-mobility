@@ -1,0 +1,18 @@
+{
+  "n_obs": 180,
+  "n_cities": 18,
+  "fixed_effects": {
+    "intercept": 0.4193365672296905,
+    "z_kde": -0.005838798436897012,
+    "z_kde2": -0.0018339518651900974
+  },
+  "z_kde_p": 0.7310551028262019,
+  "z_kde2_p": 0.2671533571813902,
+  "z_kde2_quadratic_negative": true,
+  "z_kde2_significant_001": false,
+  "log_likelihood": 132.74747451016034,
+  "preregistered_direction": "negative quadratic coefficient",
+  "linear_only_z_kde": 0.00949456525786143,
+  "linear_only_z_kde_p": 0.34001508036713246,
+  "delta_loglik_quadratic_vs_linear": -4.871553255646631
+}

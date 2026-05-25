@@ -1,0 +1,32 @@
+{
+  "gtfs_heavy_stops_300m": {
+    "n_obs": 1030,
+    "n_cities": 103,
+    "intercept": 0.13822154064370665,
+    "z_kde_beta": 0.0006383890675556954,
+    "z_kde_p": 0.8135340400141053,
+    "z_kde2_beta": 3.1274792084305486e-06,
+    "z_kde2_p": 0.9850923237807622,
+    "z_kde2_negative": false,
+    "z_kde2_sig_005": false,
+    "z_kde2_sig_001": false,
+    "z_peak": -102.06128082879499,
+    "loglik_quadratic": 872.0032822159492,
+    "loglik_linear": 879.7819295863242
+  },
+  "catchment_density_per_km2": {
+    "n_obs": 1060,
+    "n_cities": 106,
+    "intercept": 0.6981198343419357,
+    "z_kde_beta": -0.01085817363025615,
+    "z_kde_p": 0.0008120275151925217,
+    "z_kde2_beta": -9.315822546949315e-05,
+    "z_kde2_p": 0.643920180485283,
+    "z_kde2_negative": true,
+    "z_kde2_sig_005": false,
+    "z_kde2_sig_001": false,
+    "z_peak": -58.278126142559,
+    "loglik_quadratic": 702.9474064751485,
+    "loglik_linear": 710.4326551337558
+  }
+}
