@@ -1,0 +1,4 @@
+predicted_label,n,ipr_mean,ipr_std,ext_mean,ext_std,N_median
+A: compact / hub-centric,100,0.107,0.04,0.287,0.242,104.5
+B: distributed / poly-centric,18,0.047,0.018,0.425,0.23,277.0
+C: mid-sized sprawl,6,0.03,0.009,0.048,0.045,1070.5

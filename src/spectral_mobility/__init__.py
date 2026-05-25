@@ -36,6 +36,15 @@ from spectral_mobility.compare import (
     compare_cities,
     cross_city_similarity_matrix,
 )
+from spectral_mobility.multiscale import (
+    multiscale_similarity,
+    multiscale_similarity_matrix,
+)
+from spectral_mobility.uncertainty import (
+    bootstrap_similarity_matrix,
+    ci_summary_table,
+    permutation_test_block_contrast,
+)
 from spectral_mobility.diagnostics import (
     bottleneck_modes,
     extended_subspace_fraction,
@@ -88,4 +97,11 @@ __all__ = [
     "compare_cities",
     "CityComparisonResult",
     "cross_city_similarity_matrix",
+    # uncertainty
+    "bootstrap_similarity_matrix",
+    "permutation_test_block_contrast",
+    "ci_summary_table",
+    # multiscale
+    "multiscale_similarity",
+    "multiscale_similarity_matrix",
 ]

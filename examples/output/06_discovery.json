@@ -1,0 +1,12 @@
+{
+  "observed_contrast": 0.1414541994534224,
+  "null_mean": -3.1774346768951455e-05,
+  "null_std": 0.010578898532405099,
+  "p_value": 0.0,
+  "n_perm": 10000,
+  "n_in_group_a": 16,
+  "n_in_group_b": 15,
+  "partition_feature": "mean IPR",
+  "median_split_value": 0.0466056315493733,
+  "mantel_r": 0.6342929786484403
+}

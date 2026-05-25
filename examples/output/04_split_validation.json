@@ -1,0 +1,64 @@
+{
+  "mantel_correlations": [
+    {
+      "control": "A: matched-size N=400",
+      "rho": 0.4545688545688546,
+      "p": 0.005349557518376909
+    },
+    {
+      "control": "B: fixed \u03c3=500m",
+      "rho": 0.5117117117117117,
+      "p": 0.0014229663873831667
+    },
+    {
+      "control": "C: k=20",
+      "rho": 0.8350064350064351,
+      "p": 2.426600311895535e-10
+    },
+    {
+      "control": "D: k=15 + \u03c3=500m",
+      "rho": 0.44839124839124844,
+      "p": 0.0060935151743282965
+    }
+  ],
+  "block_contrasts": [
+    {
+      "recipe": "BASELINE",
+      "within_us": 0.77903503543025,
+      "within_eu": 0.7765621978362237,
+      "between": 0.6929963545774089,
+      "contrast": 0.08480226205582797
+    },
+    {
+      "recipe": "A: matched-size N=400",
+      "within_us": 0.8056168342090209,
+      "within_eu": 0.7972300342556156,
+      "between": 0.730435564908946,
+      "contrast": 0.0709878693233722
+    },
+    {
+      "recipe": "B: fixed \u03c3=500m",
+      "within_us": 0.8657334262626821,
+      "within_eu": 0.7718745912993152,
+      "between": 0.6310357578327455,
+      "contrast": 0.18776825094825322
+    },
+    {
+      "recipe": "C: k=20",
+      "within_us": 0.6732437298379919,
+      "within_eu": 0.6461775561915428,
+      "between": 0.5928209849143952,
+      "contrast": 0.06688965810037217
+    },
+    {
+      "recipe": "D: k=15 + \u03c3=500m",
+      "within_us": 0.8652174370053276,
+      "within_eu": 0.6895975585506297,
+      "between": 0.5502042257088617,
+      "contrast": 0.22720327206911684
+    }
+  ],
+  "baseline_contrast": 0.08480226205582797,
+  "controls_surviving": 4,
+  "verdict": "\ud83d\udfe2 SPLIT IS ROBUST.  The US-vs-European structural distinction survives all four controls.  Publishable."
+}

@@ -1,0 +1,32 @@
+name,iso,region,cluster_k3,cluster_k4,cluster_k5
+Citi Bike NYC,US,north_america,1,1,2
+Divvy Chicago,US,north_america,2,2,3
+Capital DC,US,north_america,1,1,1
+Bay Wheels SF,US,north_america,2,3,4
+Bluebikes Boston,US,north_america,2,3,4
+Biketown Portland,US,north_america,2,3,4
+BIXI Montréal,CA,north_america,1,1,2
+Bike Share Toronto,CA,north_america,1,1,2
+Vélib Paris,FR,europe,3,4,5
+Vélo'v Lyon,FR,europe,1,1,2
+VéLÔ Toulouse,FR,europe,2,2,3
+Le VélO Bordeaux,FR,europe,1,1,1
+Le Vélo Marseille,FR,europe,1,1,1
+Santander London,GB,europe,2,2,3
+Beryl Bournemouth,GB,europe,1,1,1
+Beryl Manchester,GB,europe,2,3,4
+Nextbike Berlin,DE,europe,1,1,2
+Swabi Augsburg,DE,europe,1,1,1
+Nextbike Praha,CZ,europe,1,1,1
+BiciMAD Madrid,ES,europe,2,2,3
+Bicing Barcelona,ES,europe,2,2,3
+Valenbisi València,ES,europe,1,1,2
+BikeMi Milan,IT,europe,2,2,3
+Villo Bruxelles,BE,europe,2,2,3
+Velo Antwerpen,BE,europe,2,3,4
+Metrorower,PL,europe,1,1,1
+Mevo Gdańsk,PL,europe,1,1,1
+Velospot CH,CH,europe,1,1,1
+Ecobici Ciudad de Mexico,MX,latam,2,2,3
+Ecobici Buenos Aires,AR,latam,2,2,3
+Bike Itaú Rio,BR,latam,1,1,1
