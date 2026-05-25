@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this software, please cite as below."
 title: "spectral-mobility: Spectral feature augmentation and applicability-domain bounds for urban mobility prediction"
 type: software
-version: "0.2.0"
+version: "0.3.0"
 date-released: "2026-05-25"
 authors:
   - family-names: "Fossé"

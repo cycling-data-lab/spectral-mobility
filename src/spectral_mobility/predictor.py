@@ -269,6 +269,72 @@ class SpectralAugmentedRegressor:
             K=self.K,
         )
 
+    def _augment_inductive(
+        self,
+        X_train: np.ndarray,
+        coords_train: np.ndarray,
+        X_test: np.ndarray,
+        coords_test: np.ndarray,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Inductive feature augmentation.
+
+        Builds the graph + eigenvectors from training nodes ONLY,
+        then projects test nodes onto the training eigenbasis using a
+        Nyström-style extension: each test node's k_nn nearest
+        training neighbours vote (Gaussian-RBF-weighted) for its
+        eigenvector values.
+
+        Returns ``(X_train_aug, X_test_aug)``.
+        """
+        from sklearn.neighbors import BallTree, NearestNeighbors
+
+        # 1) Build training graph + eigenvectors
+        W_train, sigma_used = self._build_graph(coords_train)
+        L_train = symmetric_normalised_laplacian(W_train)
+        eigvals_train, eigvecs_train = spectral_decomposition(L_train)
+        Uk = eigvecs_train[:, : self.K]
+
+        # 2) Standardise eigenvecs columnwise (if requested) — keep
+        #    scale factors so test extension matches
+        if self.standardise_eigvecs:
+            std = Uk.std(axis=0)
+            std = np.where(std > 1e-12, std, 1.0)
+            Uk_std = Uk / std[None, :]
+        else:
+            std = np.ones(Uk.shape[1])
+            Uk_std = Uk
+
+        # 3) Nyström extension: each test point gets a weighted average
+        #    of its k_nn nearest TRAINING neighbours' eigenvec values
+        if self.graph_type == "geographic":
+            train_rad = np.deg2rad(coords_train[:, ::-1])  # [lng, lat] for haversine? no — BallTree expects [lat, lng]
+            # Actually let's just match build_geographic_knn ordering:
+            train_rad = np.deg2rad(np.column_stack([coords_train[:, 0], coords_train[:, 1]]))
+            test_rad = np.deg2rad(np.column_stack([coords_test[:, 0], coords_test[:, 1]]))
+            tree = BallTree(train_rad, metric="haversine")
+            dist_rad, idx = tree.query(test_rad, k=self.k_nn)
+            from spectral_mobility.graph import EARTH_RADIUS_METRES
+
+            dist_m = dist_rad * EARTH_RADIUS_METRES
+            weights = np.exp(-(dist_m ** 2) / (2.0 * sigma_used ** 2))
+        else:
+            nn = NearestNeighbors(n_neighbors=self.k_nn, algorithm="auto").fit(coords_train)
+            dist, idx = nn.kneighbors(coords_test)
+            weights = np.exp(-(dist ** 2) / (2.0 * sigma_used ** 2))
+
+        # Normalise weights row-wise so the extension is a proper convex combination
+        w_norm = weights.sum(axis=1, keepdims=True)
+        w_norm = np.where(w_norm > 1e-12, w_norm, 1.0)
+        weights = weights / w_norm
+
+        # For each test row i, eigvec_test[i, :] = sum_j weights[i, j] * Uk_std[idx[i, j], :]
+        # Equivalent to (weights @ Uk_std[idx])
+        Uk_test = np.einsum("ij,ijk->ik", weights, Uk_std[idx])
+
+        X_train_aug = np.column_stack([X_train, Uk_std])
+        X_test_aug = np.column_stack([X_test, Uk_test])
+        return X_train_aug, X_test_aug
+
     def cross_validate(
         self,
         X: np.ndarray,
@@ -278,6 +344,7 @@ class SpectralAugmentedRegressor:
         random_state: int = 42,
         scoring: Callable[[np.ndarray, np.ndarray], float] | None = None,
         return_predictions: bool = False,
+        protocol: Literal["transductive", "inductive"] = "transductive",
     ) -> dict:
         """Compare augmented vs baseline (no augmentation) in K-fold LNO.
 
@@ -291,16 +358,33 @@ class SpectralAugmentedRegressor:
             to R² (``sklearn.metrics.r2_score``).
         return_predictions : bool, default False
             If True, include per-fold predictions in the output.
+        protocol : {"transductive", "inductive"}, default "transductive"
+            ``"transductive"`` builds the graph and eigenvectors on
+            all N nodes at fit time; only test ``y`` values are
+            held out.  This is the LSO protocol of the structural-
+            bound papers, with no ``y`` leakage but coord leakage
+            into the eigenbasis is allowed.
+
+            ``"inductive"`` rebuilds the graph from training coords
+            only at each fold, then projects test points onto the
+            training eigenbasis via a Nyström-style k-NN extension.
+            This corresponds to a "deploy to new stations" use case
+            and is the strictly leak-free protocol.
 
         Returns
         -------
         result : dict
             Keys ``baseline_scores``, ``augmented_scores``,
             ``baseline_mean``, ``augmented_mean``, ``mean_gain``,
-            ``ceiling``, and optionally ``predictions``.
+            ``ceiling``, ``protocol`` and optionally ``predictions``.
         """
         from sklearn.metrics import r2_score
         from sklearn.model_selection import KFold
+
+        if protocol not in ("transductive", "inductive"):
+            raise ValueError(
+                f"protocol must be 'transductive' or 'inductive', got {protocol!r}"
+            )
 
         if scoring is None:
             scoring = r2_score
@@ -319,8 +403,19 @@ class SpectralAugmentedRegressor:
             test_mask = ~train_mask
 
             # Augmented model
-            self.fit(X, coords, y, train_mask=train_mask)
-            y_pred_aug = self.predict(test_mask=test_mask)
+            if protocol == "transductive":
+                self.fit(X, coords, y, train_mask=train_mask)
+                y_pred_aug = self.predict(test_mask=test_mask)
+            else:
+                # inductive: build augmented features for train and test
+                # using only training coords for graph + Nyström extension
+                X_train_aug, X_test_aug = self._augment_inductive(
+                    X[train_mask], coords[train_mask],
+                    X[test_mask], coords[test_mask],
+                )
+                model = self._clone_estimator()
+                model.fit(X_train_aug, y[train_mask])
+                y_pred_aug = model.predict(X_test_aug)
             augmented_scores.append(float(scoring(y[test_mask], y_pred_aug)))
             augmented_preds[test_mask] = y_pred_aug
 
@@ -331,7 +426,7 @@ class SpectralAugmentedRegressor:
             baseline_scores.append(float(scoring(y[test_mask], y_pred_base)))
             baseline_preds[test_mask] = y_pred_base
 
-        # Recompute ceiling on the full data once at the end
+        # Recompute ceiling on the full data once at the end (transductive)
         self.fit(X, coords, y)
         ceiling = self.ceiling()
 
@@ -347,6 +442,7 @@ class SpectralAugmentedRegressor:
                 "delta_r2": ceiling.delta_r2,
                 "K": ceiling.K,
             },
+            "protocol": protocol,
         }
         if return_predictions:
             result["predictions"] = {

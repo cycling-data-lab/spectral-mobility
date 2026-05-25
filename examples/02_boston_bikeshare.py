@@ -90,24 +90,40 @@ def main() -> None:
     print(f"  R² augmented (K=16)  : {ceiling.r2_augmented:.4f}")
     print(f"  ΔR² (ceiling lift)   : +{ceiling.delta_r2:.4f}")
 
-    # ── 2. Realized LSO comparison ──────────────────────────────────
-    print("\nRunning 5-fold leave-station-out cross-validation...")
-    cv = model.cross_validate(X, coords, y, n_folds=5, random_state=42)
-    print(f"  Baseline LightGBM   (no augmentation): mean R² = {cv['baseline_mean']:+.4f}")
-    print(f"  Augmented LightGBM  (K=16 eigvecs)    : mean R² = {cv['augmented_mean']:+.4f}")
-    print(f"  Mean realized gain                    : {cv['mean_gain']:+.4f}")
+    # ── 2. Realized LSO comparison — TRANSDUCTIVE protocol ─────────
+    # graph + eigvecs built once over all 493 stations; only y values
+    # of test stations are held out per fold
+    print("\nRunning 5-fold LSO — transductive protocol...")
+    cv_t = model.cross_validate(X, coords, y, n_folds=5, random_state=42,
+                                protocol="transductive")
+    print(f"  Baseline                            : mean R² = {cv_t['baseline_mean']:+.4f}")
+    print(f"  Augmented (transductive)            : mean R² = {cv_t['augmented_mean']:+.4f}")
+    print(f"  Mean gain (transductive)            : {cv_t['mean_gain']:+.4f}")
 
-    # ── 3. Per-fold breakdown ───────────────────────────────────────
-    print("\nPer-fold R²:")
-    for i, (b, a) in enumerate(zip(cv["baseline_scores"], cv["augmented_scores"]), 1):
+    # ── 3. Realized LSO — INDUCTIVE protocol (no coord leakage) ────
+    # graph + eigvecs built ONLY on training stations per fold; test
+    # stations projected onto training eigenbasis via Nyström extension
+    print("\nRunning 5-fold LSO — inductive protocol (strict, no leakage)...")
+    cv_i = model.cross_validate(X, coords, y, n_folds=5, random_state=42,
+                                protocol="inductive")
+    print(f"  Augmented (inductive)               : mean R² = {cv_i['augmented_mean']:+.4f}")
+    print(f"  Mean gain (inductive)               : {cv_i['mean_gain']:+.4f}")
+
+    # ── 4. Per-fold breakdown ───────────────────────────────────────
+    print("\nPer-fold R² (transductive):")
+    for i, (b, a) in enumerate(zip(cv_t["baseline_scores"], cv_t["augmented_scores"]), 1):
         print(f"  Fold {i}: baseline {b:+.3f}   |   augmented {a:+.3f}   |   Δ {a-b:+.3f}")
 
-    # ── 4. Operational reading ──────────────────────────────────────
-    realized_fraction = cv["mean_gain"] / ceiling.delta_r2 if ceiling.delta_r2 > 0 else 0
+    # ── 5. Operational reading ──────────────────────────────────────
+    realized_fraction = (
+        cv_t["mean_gain"] / ceiling.delta_r2 if ceiling.delta_r2 > 0 else 0
+    )
     print("\nReading:")
-    print(f"  The ceiling lift (closed form) is +{ceiling.delta_r2:.3f}.")
-    print(f"  The realised lift (5-fold LSO) is +{cv['mean_gain']:+.3f}.")
-    print(f"  LightGBM captures {realized_fraction*100:.0f}% of the achievable spectral gain.")
+    print(f"  Ceiling lift (closed form):     +{ceiling.delta_r2:+.3f}")
+    print(f"  Realised lift (transductive):   {cv_t['mean_gain']:+.3f}")
+    print(f"  Realised lift (inductive):      {cv_i['mean_gain']:+.3f}")
+    print(f"  Transductive captures {realized_fraction*100:.0f}% of the closed-form ceiling.")
+    print("  The inductive number is the strict 'deploy to new stations' setting.")
 
 
 if __name__ == "__main__":

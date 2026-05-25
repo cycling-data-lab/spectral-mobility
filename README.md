@@ -2,8 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/license/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-50%20passing-brightgreen.svg)](./tests/)
-[![Version](https://img.shields.io/badge/version-0.2.0-orange.svg)](./pyproject.toml)
+[![Tests](https://img.shields.io/badge/tests-60%20passing-brightgreen.svg)](./tests/)
+[![Version](https://img.shields.io/badge/version-0.3.0-orange.svg)](./pyproject.toml)
 
 **Spectral feature augmentation and applicability-domain bounds for urban mobility prediction.**
 
@@ -59,12 +59,40 @@ print(f"gain:         {result['mean_gain']:+.3f}")
 ```
 
 On Boston Bluebikes (493 stations, 4 IMD features, 5-fold LSO):
-**baseline R² = +0.05  →  augmented R² = +0.40  (gain +0.35)**.
+
+| Protocol | Baseline R² | Augmented R² | Gain |
+|---|---|---|---|
+| Transductive | +0.05 | +0.40 | **+0.35** |
+| Inductive (strict, no leakage) | +0.05 | **+0.46** | **+0.41** |
+
 See [`examples/02_boston_bikeshare.py`](./examples/02_boston_bikeshare.py).
 
 The wrapper defaults to LightGBM if available, falling back to
 `sklearn.ensemble.GradientBoostingRegressor` otherwise.  Any
 sklearn-compatible regressor can be passed as ``base_estimator``.
+
+### Inductive vs transductive
+
+```python
+# Strict "deploy to new stations" evaluation — rebuilds eigenbasis per
+# fold using only training coordinates, projects test points via
+# Nyström-style k-NN extension.  No coordinate leakage.
+result = model.cross_validate(X, coords, y, n_folds=5, protocol="inductive")
+```
+
+### Visualisation helpers
+
+```python
+from spectral_mobility.plots import (
+    plot_ceiling_curve, plot_bottleneck_map,
+    plot_spectrum, plot_cv_comparison,
+)
+
+# Identify and visualise the worst structural bottleneck of the network
+from spectral_mobility import bottleneck_modes
+worst_mode = bottleneck_modes(model.eigvecs_, n_top=1)[0]
+plot_bottleneck_map(coords, model.eigvecs_[:, worst_mode])
+```
 
 ## Lower-level API
 
