@@ -1,0 +1,37 @@
+{
+  "per_city_OLS": {
+    "estimator": "per_city_OLS",
+    "n": 11,
+    "z_kde_beta": -0.07873242656898546,
+    "z_kde_p": 0.13177606097282507,
+    "ci_low": -0.18618003012543416,
+    "ci_high": 0.028715176987463217,
+    "sign_correct": true,
+    "sig_001": false,
+    "sig_005": false
+  },
+  "weighted_OLS": {
+    "estimator": "weighted_OLS",
+    "n": 81,
+    "z_kde_beta": -0.10578073362010278,
+    "z_kde_p": 0.001587157854487102,
+    "ci_low": -0.170139853744224,
+    "ci_high": -0.04142161349598156,
+    "sign_correct": true,
+    "sig_001": true,
+    "sig_005": true
+  },
+  "cluster_bootstrap": {
+    "estimator": "cluster_bootstrap",
+    "n_cities": 11,
+    "n_boot": 2000,
+    "z_kde_beta_point": -0.07873242656898546,
+    "z_kde_beta_mean": -0.09951558467778043,
+    "ci_low": -0.3078768510295894,
+    "ci_high": -0.014929549795676199,
+    "two_tailed_p": 0.001,
+    "fraction_negative": 0.9995,
+    "sig_001": true,
+    "sig_005": true
+  }
+}
