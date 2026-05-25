@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite as below."
+title: "spectral-mobility: Spectral feature augmentation and applicability-domain bounds for urban mobility prediction"
+type: software
+version: "0.1.0"
+date-released: "2026-05-25"
+authors:
+  - family-names: "Fossé"
+    given-names: "Rohan"
+    orcid: "https://orcid.org/0009-0002-2195-0198"
+    affiliation: "CESI Engineering School, Montpellier, France"
+    email: "rfosse@cesi.fr"
+  - family-names: "Pallares"
+    given-names: "Gaël"
+    orcid: "https://orcid.org/0009-0002-8680-604X"
+    affiliation: "CESI LINEACT (EA 7527), Montpellier, France"
+repository-code: "https://github.com/cycling-data-lab/spectral-mobility"
+url: "https://github.com/cycling-data-lab/spectral-mobility"
+license: MIT
+keywords:
+  - "graph signal processing"
+  - "spectral graph theory"
+  - "urban mobility"
+  - "applicability domain"
+  - "structural bounds"
+  - "feature engineering"
+  - "machine learning"
+abstract: >-
+  spectral-mobility implements the structural applicability bound
+  on graph-supervised learning and turns its diagnostic into a
+  practical feature-engineering tool.  For any prediction task on
+  a sparse spatial or feature-space graph, the package computes
+  the closed-form predictability ceiling R²_spec(features, y),
+  augments the feature matrix with the top-K low-frequency
+  Laplacian eigenvectors, and identifies the geographic
+  bottlenecks that cap the bound.  Validated on 76 independent
+  tests (24 bike-share networks + 13 French metropolitan regions
+  × 4 commute modes); all 76 show positive ΔR² from augmentation.
