@@ -1,0 +1,23 @@
+{
+  "h1a_block": {
+    "n_cities": 14,
+    "dirichlet_beta": 0.968967618400967,
+    "dirichlet_p": 0.7317833032169629,
+    "log_N_beta": 3.008672656756667,
+    "log_N_p": 0.21300044957849326,
+    "R2_overall": 0.15096455335534376,
+    "sign_correct": false,
+    "sig_001": false
+  },
+  "h1b_block": {
+    "n_cities": 11,
+    "z_kde_beta": -0.17545029902028766,
+    "z_kde_p": 7.807491554929348e-05,
+    "sign_correct": true,
+    "sig_005": true
+  },
+  "block_vs_random": {
+    "mean_r2_drop": 3.294664414993631,
+    "mean_gain_drop": 0.1031828473631201
+  }
+}
