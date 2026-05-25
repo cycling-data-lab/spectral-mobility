@@ -2,8 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/license/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-60%20passing-brightgreen.svg)](./tests/)
-[![Version](https://img.shields.io/badge/version-0.3.0-orange.svg)](./pyproject.toml)
+[![Tests](https://img.shields.io/badge/tests-72%20passing-brightgreen.svg)](./tests/)
+[![Version](https://img.shields.io/badge/version-0.4.0-orange.svg)](./pyproject.toml)
 
 **Spectral feature augmentation and applicability-domain bounds for urban mobility prediction.**
 
@@ -94,6 +94,43 @@ worst_mode = bottleneck_modes(model.eigvecs_, n_top=1)[0]
 plot_bottleneck_map(coords, model.eigvecs_[:, worst_mode])
 ```
 
+### City profiles and cross-city comparison
+
+```python
+from spectral_mobility import (
+    CitySpectralProfile, compare_cities, cross_city_similarity_matrix,
+)
+
+paris = CitySpectralProfile.from_coords(
+    name="Vélib Paris", lat=lat, lng=lng,
+    features=X_imd, target=y_demand, k_nn=6, sigma=300,
+)
+lyon = CitySpectralProfile.from_coords(...)
+
+paris.summary()                       # dict with all key stats
+paris.bottleneck_zones(n=5)           # the 5 worst structural bottlenecks
+paris.predictability_ceiling(K=16)    # closed-form R²_spec
+paris.plot_overview()                 # 4-panel diagnostic figure
+
+cmp = compare_cities(paris, lyon)
+print(cmp.spectral_similarity)        # 0.80 — high
+
+# Multi-city similarity matrix (heatmap + clustering)
+profiles = [paris, lyon, marseille, ...]
+M, names = cross_city_similarity_matrix(profiles)
+```
+
+On a 9-city panel (Boston, DC, Chicago, SF, London, Montréal, Paris,
+Lyon, Toulouse) the package recovers an unsupervised
+**US-vs-European structural split** without being told anything
+about continents or city sizes:
+
+- Top similar pairs: Boston↔Chicago (0.93), DC↔Chicago (0.92),
+  Boston↔DC (0.89), Lyon↔Toulouse (0.87)
+- Most dissimilar: US-east ↔ Paris/London (~0.48-0.51)
+
+See [`examples/03_paris_vs_lyon.py`](./examples/03_paris_vs_lyon.py).
+
 ## Lower-level API
 
 ```python
@@ -144,6 +181,9 @@ synthetic end-to-end demo using the low-level API.
 | `locate_bottleneck_nodes(psi, mass_threshold)` | Geographic footprint of a localized mode |
 | `extended_subspace_fraction(eigvecs)` | What fraction of modes are extended |
 | `SpectralAugmentedRegressor(...)` | sklearn-style wrapper: `.fit(X, coords, y)`, `.predict()`, `.ceiling()`, `.cross_validate(...)` |
+| `CitySpectralProfile.from_coords(...)` | Self-contained spectral profile of one network |
+| `compare_cities(profile_a, profile_b)` | Pairwise Wasserstein / KS / similarity |
+| `cross_city_similarity_matrix(profiles)` | Pairwise similarity matrix over N cities |
 
 ## Theory in two sentences
 

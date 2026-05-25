@@ -186,6 +186,133 @@ def plot_spectrum(
     return ax
 
 
+def plot_city_comparison(
+    profile_a,
+    profile_b,
+    *,
+    figsize: tuple[float, float] = (14, 5),
+):
+    """Side-by-side comparison of two CitySpectralProfile objects.
+
+    Draws an overlay of the eigenvalue distributions and IPR
+    distributions, plus a small numerical comparison.
+    """
+    fig, axes = plt.subplots(1, 3, figsize=figsize, constrained_layout=True)
+
+    # (a) eigenvalue density (KDE-like via histogram)
+    ax = axes[0]
+    ax.hist(profile_a.eigvals, bins=50, alpha=0.55, density=True,
+            label=profile_a.name, color="C0")
+    ax.hist(profile_b.eigvals, bins=50, alpha=0.55, density=True,
+            label=profile_b.name, color="C3")
+    ax.set_xlabel(r"$\lambda$")
+    ax.set_ylabel("density")
+    ax.set_title("Eigenvalue distributions")
+    ax.legend(fontsize=9, loc="best")
+    ax.grid(True, alpha=0.3)
+
+    # (b) IPR distribution (log)
+    ax = axes[1]
+    ax.hist(np.log10(profile_a.ipr + 1e-12), bins=50, alpha=0.55,
+            density=True, label=profile_a.name, color="C0")
+    ax.hist(np.log10(profile_b.ipr + 1e-12), bins=50, alpha=0.55,
+            density=True, label=profile_b.name, color="C3")
+    ax.set_xlabel(r"$\log_{10}\,\mathrm{IPR}$")
+    ax.set_ylabel("density")
+    ax.set_title("IPR distributions (log)")
+    ax.legend(fontsize=9, loc="best")
+    ax.grid(True, alpha=0.3)
+
+    # (c) comparison table
+    from spectral_mobility.compare import compare_cities
+
+    cmp = compare_cities(profile_a, profile_b)
+    sa = profile_a.summary()
+    sb = profile_b.summary()
+    rows = [
+        ("N", sa["N"], sb["N"]),
+        ("σ", f"{sa['sigma']:.0f}", f"{sb['sigma']:.0f}"),
+        ("⟨IPR⟩", f"{sa['mean_ipr']:.3f}", f"{sb['mean_ipr']:.3f}"),
+        ("med IPR", f"{sa['median_ipr']:.3f}", f"{sb['median_ipr']:.3f}"),
+        ("ext. frac.", f"{sa['extended_fraction']:.2f}",
+         f"{sb['extended_fraction']:.2f}"),
+        ("⟨r⟩", f"{sa['mean_level_spacing_r']:.3f}",
+         f"{sb['mean_level_spacing_r']:.3f}"),
+    ]
+    if "R2_imd" in sa and "R2_imd" in sb:
+        rows.append(("R²_IMD", f"{sa['R2_imd']:.3f}", f"{sb['R2_imd']:.3f}"))
+        rows.append(
+            ("R²_aug K16", f"{sa['R2_augmented_K16']:.3f}",
+             f"{sb['R2_augmented_K16']:.3f}")
+        )
+
+    text_lines = [
+        f"{profile_a.name}   ↔   {profile_b.name}",
+        "─" * 50,
+        f"{'metric':<14s}  {profile_a.name[:12]:>13s}  {profile_b.name[:12]:>13s}",
+    ]
+    for r in rows:
+        text_lines.append(f"{r[0]:<14s}  {str(r[1]):>13s}  {str(r[2]):>13s}")
+    text_lines += [
+        "─" * 50,
+        f"Wasserstein (eigvals)  : {cmp.wasserstein_eigvals:.4f}",
+        f"Wasserstein (log IPR)  : {cmp.wasserstein_ipr:.4f}",
+        f"KS (eigvals)           : {cmp.ks_eigvals:.4f}",
+        f"KS (log IPR)           : {cmp.ks_ipr:.4f}",
+        "─" * 50,
+        f"Spectral similarity    : {cmp.spectral_similarity:.3f}",
+    ]
+    axes[2].text(0.01, 0.99, "\n".join(text_lines),
+                 ha="left", va="top", family="monospace", fontsize=9,
+                 transform=axes[2].transAxes)
+    axes[2].set_axis_off()
+    fig.suptitle(f"Spectral comparison: {profile_a.name} vs {profile_b.name}",
+                 fontsize=11)
+    return fig
+
+
+def plot_similarity_matrix(
+    matrix: np.ndarray,
+    names: list[str],
+    *,
+    ax: "Axes | None" = None,
+    cmap: str = "viridis",
+    annotate: bool = True,
+):
+    """Heatmap of a pairwise spectral-similarity matrix.
+
+    Parameters
+    ----------
+    matrix : (n, n) np.ndarray
+        Symmetric similarity matrix in ``[0, 1]``.
+    names : list of str
+        City names; length ``n``.
+    ax : matplotlib.axes.Axes, optional
+    cmap : str, default "viridis"
+    annotate : bool, default True
+        Print similarity values in each cell.
+    """
+    matrix = np.asarray(matrix)
+    n = matrix.shape[0]
+    if ax is None:
+        _, ax = plt.subplots(figsize=(0.7 * n + 2, 0.7 * n + 2),
+                              constrained_layout=True)
+    im = ax.imshow(matrix, cmap=cmap, vmin=0, vmax=1, aspect="auto")
+    ax.set_xticks(range(n))
+    ax.set_yticks(range(n))
+    ax.set_xticklabels(names, rotation=45, ha="right", fontsize=8)
+    ax.set_yticklabels(names, fontsize=8)
+    plt.colorbar(im, ax=ax, label="spectral similarity", shrink=0.85)
+    if annotate:
+        for i in range(n):
+            for j in range(n):
+                ax.text(j, i, f"{matrix[i, j]:.2f}",
+                        ha="center", va="center", fontsize=7,
+                        color="white" if matrix[i, j] < 0.5 else "black")
+    ax.set_title("Pairwise spectral similarity")
+    return ax
+
+
 def plot_cv_comparison(
     cv_result: dict,
     *,

@@ -31,6 +31,11 @@ from spectral_mobility.bound import (
     r2_spec_subspace,
     spectral_bound,
 )
+from spectral_mobility.compare import (
+    CityComparisonResult,
+    compare_cities,
+    cross_city_similarity_matrix,
+)
 from spectral_mobility.diagnostics import (
     bottleneck_modes,
     extended_subspace_fraction,
@@ -43,6 +48,7 @@ from spectral_mobility.graph import (
     symmetric_normalised_laplacian,
 )
 from spectral_mobility.predictor import SpectralAugmentedRegressor
+from spectral_mobility.profile import CitySpectralProfile
 from spectral_mobility.spectral import (
     inverse_participation_ratio,
     level_spacing_ratios,
@@ -50,7 +56,7 @@ from spectral_mobility.spectral import (
     spectral_decomposition,
 )
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 __all__ = [
     "__version__",
@@ -77,4 +83,9 @@ __all__ = [
     "extended_subspace_fraction",
     # predictor
     "SpectralAugmentedRegressor",
+    # profile + comparison
+    "CitySpectralProfile",
+    "compare_cities",
+    "CityComparisonResult",
+    "cross_city_similarity_matrix",
 ]
