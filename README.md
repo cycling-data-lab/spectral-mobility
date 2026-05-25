@@ -2,8 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/license/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-72%20passing-brightgreen.svg)](./tests/)
-[![Version](https://img.shields.io/badge/version-0.4.0-orange.svg)](./pyproject.toml)
+[![Tests](https://img.shields.io/badge/tests-82%20passing-brightgreen.svg)](./tests/)
+[![Version](https://img.shields.io/badge/version-0.5.0-orange.svg)](./pyproject.toml)
 
 **Spectral feature augmentation and applicability-domain bounds for urban mobility prediction.**
 
@@ -200,6 +200,19 @@ See the
 for the empirical validation and the
 [structural-bounds-framework paper](https://github.com/cycling-data-lab/structural-bounds-framework)
 for the proof of the bound.
+
+## Companion paper repository
+
+The research scripts and pre-registrations that produced the manuscript
+on spatial cross-validation leakage and graph-spectral applicability
+live in a separate repository:
+
+- [**paper-spectral-cv-illusion**](https://github.com/cycling-data-lab/paper-spectral-cv-illusion)
+
+That repo hosts the 18 numbered investigation scripts (05–22), three
+pre-registration drafts, all artefacts (CSV/JSON/PDF), the LaTeX
+manuscript, and a reproducibility Makefile.  It depends on this
+package (`spectral-mobility >= 0.5.0`).
 
 ## Cycling Data Lab integration
 
